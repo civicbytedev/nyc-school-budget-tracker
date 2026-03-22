@@ -1,129 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>NYC School Budget Tracker — CivicByte</title>
-    <meta name="description" content="Interactive dashboard exploring per-pupil spending, Title I funding, and PTA contributions across NYC public schools. Built with NYC DOE open data.">
-    <style>
-          *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-          :root{--ink:#1a1a2e;--slate:#4a4a6a;--mist:#f4f4f8;--accent:#2563eb;--accent-light:#dbeafe;--white:#fff;--green:#16a34a;--red:#dc2626;--orange:#ea580c}
-          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;color:var(--ink);background:var(--mist);line-height:1.5}
-          header{background:var(--white);border-bottom:1px solid #e5e5e5;padding:1rem 2rem}
-          .header-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
-          .logo{font-weight:700;font-size:1.1rem;color:var(--ink);text-decoration:none}
-          .logo span{color:var(--accent)}
-          .badge{background:var(--accent-light);color:var(--accent);font-size:.75rem;font-weight:600;padding:.2rem .6rem;border-radius:12px;margin-left:.5rem}
-          .container{max-width:1200px;margin:0 auto;padding:2rem}
-          h1{font-size:1.75rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.25rem}
-          .subtitle{color:var(--slate);margin-bottom:2rem;font-size:.95rem}
-          .controls{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem}
-          .search-box{flex:1;min-width:250px;padding:.7rem 1rem;border:2px solid #e5e5e5;border-radius:8px;font-size:.95rem;background:var(--white);transition:border .2s}
-          .search-box:focus{outline:none;border-color:var(--accent)}
-          select{padding:.7rem 1rem;border:2px solid #e5e5e5;border-radius:8px;font-size:.9rem;background:var(--white);cursor:pointer}
-          .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
-          .stat-card{background:var(--white);border-radius:10px;padding:1.25rem;text-align:center}
-          .stat-card .num{font-size:1.8rem;font-weight:800;color:var(--accent)}
-          .stat-card .label{color:var(--slate);font-size:.8rem;margin-top:.15rem}
-          table{width:100%;border-collapse:collapse;background:var(--white);border-radius:10px;overflow:hidden}
-          thead{background:var(--ink);color:var(--white)}
-          th{padding:.8rem 1rem;text-align:left;font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;user-select:none}
-          th:hover{background:#2a2a4e}
-          th .arrow{margin-left:.3rem;font-size:.7rem}
-          td{padding:.75rem 1rem;border-bottom:1px solid #f0f0f0;font-size:.9rem}
-          tr:hover td{background:var(--accent-light)}
-          .pov-high{color:var(--red);font-weight:600}
-          .pov-mid{color:var(--orange);font-weight:600}
-          .pov-low{color:var(--green);font-weight:600}
-          .bar-wrap{width:100%;height:8px;background:#e5e5e5;border-radius:4px;overflow:hidden}
-          .bar-fill{height:100%;border-radius:4px;transition:width .3s}
-          .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center}
-          .modal-overlay.active{display:flex}
-          .modal{background:var(--white);border-radius:16px;padding:2.5rem;max-width:650px;width:90%;max-height:85vh;overflow-y:auto;position:relative}
-          .modal h2{font-size:1.4rem;margin-bottom:.25rem}
-          .modal .close{position:absolute;top:1rem;right:1.5rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--slate)}
-          .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
-          .detail-item{background:var(--mist);padding:1rem;border-radius:8px}
-          .detail-item .d-label{font-size:.75rem;color:var(--slate);text-transform:uppercase;letter-spacing:.04em}
-          .detail-item .d-value{font-size:1.3rem;font-weight:700;margin-top:.15rem}
-          .chart-bar{display:flex;align-items:center;gap:.5rem;margin:.4rem 0}
-          .chart-bar .cb-label{width:80px;font-size:.8rem;color:var(--slate);text-align:right}
-          .chart-bar .cb-track{flex:1;height:20px;background:#e5e5e5;border-radius:4px;overflow:hidden}
-          .chart-bar .cb-fill{height:100%;border-radius:4px}
-          .chart-bar .cb-val{width:60px;font-size:.8rem;font-weight:600}
-          .no-results{text-align:center;padding:3rem;color:var(--slate)}
-          footer{text-align:center;padding:2rem;color:var(--slate);font-size:.8rem}
-          footer a{color:var(--accent);text-decoration:none}
-          @media(max-width:768px){
-                  .controls{flex-direction:column}
-                  .detail-grid{grid-template-columns:1fr}
-                  th,td{padding:.5rem .6rem;font-size:.8rem}
-          }
-        </style>
-  </head>
-  <body>
-      <header>
-            <div class="header-inner">
-                    <a href="https://civicbytedev.github.io" class="logo">Civic<span>Byte</span></a>a>
-                  <span class="badge">NYC School Budget Tracker</span>
-            </div>div>
-      </header>
-  
-    <div class="container">
-        <h1>NYC School Budget Tracker</h1>
-        <p class="subtitle">Explore per-pupil spending, Title I funding, and PTA contributions across New York City public schools. Data from NYC DOE Open Data.</p>p>
-    
-        <div class="controls">
-              <input type="text" class="search-box" id="search" placeholder="Search by school name or DBN...">
-              <select id="boroughFilter">
-                      <option value="">All Boroughs</option>option>
-                      <option value="Manhattan">Manhattan</option>option>
-                      <option value="Brooklyn">Brooklyn</option>option>
-                      <option value="Bronx">Bronx</option>option>
-                      <option value="Queens">Queens</option>option>
-                      <option value="Staten Island">Staten Island</option>option>
-              </select>select>
-              <select id="gradeFilter">
-                      <option value="">All Grades</option>option>
-                      <option value="K-5">K-5 Elementary</option>option>
-                      <option value="6-8">6-8 Middle</option>option>
-                      <option value="9-12">9-12 High</option>option>
-                      <option value="K-8">K-8</option>option>
-                      <option value="K-12">K-12</option>option>
-              </select>select>
-        </div>div>
-    
-        <div class="stats-row" id="statsRow"></div>div>
-    
-        <table>
-                <thead>
-                          <tr>
-                                      <th data-col="name">School <span class="arrow"></span></th>th>
-                                      <th data-col="borough">Borough <span class="arrow"></span></th>th>
-                                      <th data-col="enrollment">Enrollment <span class="arrow"></span></th>th>
-                                      <th data-col="perPupil">Per-Pupil $ <span class="arrow"></span></th>th>
-                                      <th data-col="povertyRate">Poverty Rate <span class="arrow"></span></th>th>
-                                      <th data-col="ptaPerPupil">PTA $/Pupil <span class="arrow"></span></th>th>
-                          </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>tbody>
-        </table>
-          <div class="no-results" id="noResults" style="display:none">No schools match your search.</div>div>
-    </div>div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NYC School Budget Tracker — CivicByte</title>
+  <meta name="description" content="Interactive dashboard exploring per-pupil spending, Title I funding, and PTA contributions across NYC public schools.">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --ink: #0f172a; --slate: #475569; --mist: #f8fafc;
+      --accent: #2563eb; --accent-light: #dbeafe; --white: #ffffff;
+      --border: #e2e8f0; --green: #16a34a; --red: #dc2626; --orange: #ea580c;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; color: var(--ink); background: var(--mist); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { text-decoration: none; color: inherit; }
+    header { background: var(--white); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
+    .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-weight: 800; font-size: 1.15rem; }
+    .logo em { font-style: normal; color: var(--accent); }
+    .badge { background: var(--accent-light); color: var(--accent); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--slate); margin-bottom: 2rem; font-size: 0.95rem; }
+    .controls { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .search-box { flex: 1; min-width: 250px; padding: 0.7rem 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: var(--white); transition: border 0.2s; }
+    .search-box:focus { outline: none; border-color: var(--accent); }
+    select { padding: 0.7rem 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: var(--white); cursor: pointer; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--white); border-radius: 10px; padding: 1.25rem; text-align: center; border: 1px solid var(--border); }
+    .stat-card .num { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+    .stat-card .label { color: var(--slate); font-size: 0.8rem; margin-top: 0.15rem; }
+    table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+    thead { background: var(--ink); color: var(--white); }
+    th { padding: 0.8rem 1rem; text-align: left; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; user-select: none; }
+    th:hover { background: #1e293b; }
+    th .arrow { margin-left: 0.3rem; font-size: 0.7rem; }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    tr:hover td { background: var(--accent-light); }
+    .pov-high { color: var(--red); font-weight: 600; }
+    .pov-mid { color: var(--orange); font-weight: 600; }
+    .pov-low { color: var(--green); font-weight: 600; }
+    .bar-wrap { width: 100%; height: 6px; background: #e5e5e5; border-radius: 4px; overflow: hidden; margin-top: 0.25rem; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: var(--white); border-radius: 16px; padding: 2.5rem; max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; }
+    .modal h2 { font-size: 1.4rem; margin-bottom: 0.25rem; }
+    .modal .close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--slate); }
+    .modal .close:hover { color: var(--ink); }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .detail-item { background: var(--mist); padding: 1rem; border-radius: 8px; }
+    .detail-item .d-label { font-size: 0.75rem; color: var(--slate); text-transform: uppercase; letter-spacing: 0.04em; }
+    .detail-item .d-value { font-size: 1.3rem; font-weight: 700; margin-top: 0.15rem; }
+    .chart-bar { display: flex; align-items: center; gap: 0.5rem; margin: 0.4rem 0; }
+    .chart-bar .cb-label { width: 80px; font-size: 0.8rem; color: var(--slate); text-align: right; }
+    .chart-bar .cb-track { flex: 1; height: 20px; background: #e5e5e5; border-radius: 4px; overflow: hidden; }
+    .chart-bar .cb-fill { height: 100%; border-radius: 4px; }
+    .chart-bar .cb-val { width: 60px; font-size: 0.8rem; font-weight: 600; }
+    .no-results { text-align: center; padding: 3rem; color: var(--slate); }
+    footer { text-align: center; padding: 2rem; color: var(--slate); font-size: 0.8rem; }
+    footer a { color: var(--accent); }
+    footer a:hover { text-decoration: underline; }
+    @media (max-width: 768px) {
+      .controls { flex-direction: column; }
+      .detail-grid { grid-template-columns: 1fr; }
+      th, td { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
 
-      <div class="modal-overlay" id="modal">
-            <div class="modal">
-                    <button class="close" id="modalClose">&times;</button>button>
-                    <div id="modalContent"></div>div>
-            </div>div>
-      </div>div>
+  <header>
+    <div class="header-inner">
+      <a href="https://civicbyte.dev" class="logo">Civic<em>Byte</em></a>
+      <span class="badge">NYC School Budget Tracker</span>
+    </div>
+  </header>
 
-      <footer>
-            <p>Built by <a href="https://civicbytedev.github.io">CivicByte</a>a> &middot; Data from <a href="https://data.cityofnewyork.us">NYC Open Data</a>a> &middot; <a href="https://github.com/civicbytedev/nyc-school-budget-tracker">View Source</a>a></p>
-      </footer>
-  
+  <div class="container">
+    <h1>NYC School Budget Tracker</h1>
+    <p class="subtitle">Explore per-pupil spending, Title I funding, and PTA contributions across New York City public schools. Data from NYC DOE Open Data.</p>
+
+    <div class="controls">
+      <input type="text" class="search-box" id="search" placeholder="Search by school name or DBN...">
+      <select id="boroughFilter">
+        <option value="">All Boroughs</option>
+        <option value="Manhattan">Manhattan</option>
+        <option value="Brooklyn">Brooklyn</option>
+        <option value="Bronx">Bronx</option>
+        <option value="Queens">Queens</option>
+        <option value="Staten Island">Staten Island</option>
+      </select>
+      <select id="gradeFilter">
+        <option value="">All Grades</option>
+        <option value="K-5">K-5 Elementary</option>
+        <option value="6-8">6-8 Middle</option>
+        <option value="9-12">9-12 High</option>
+        <option value="K-8">K-8</option>
+        <option value="K-12">K-12</option>
+      </select>
+    </div>
+
+    <div class="stats-row" id="statsRow"></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th data-col="name">School <span class="arrow"></span></th>
+          <th data-col="borough">Borough <span class="arrow"></span></th>
+          <th data-col="enrollment">Enrollment <span class="arrow"></span></th>
+          <th data-col="perPupil">Per-Pupil $ <span class="arrow"></span></th>
+          <th data-col="povertyRate">Poverty Rate <span class="arrow"></span></th>
+          <th data-col="ptaPerPupil">PTA $/Pupil <span class="arrow"></span></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="no-results" id="noResults" style="display:none">No schools match your search.</div>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <button class="close" id="modalClose">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Built by <a href="https://civicbyte.dev">CivicByte</a> &middot; Data from <a href="https://data.cityofnewyork.us">NYC Open Data</a> &middot; <a href="https://github.com/civicbytedev/nyc-school-budget-tracker">View Source</a></p>
+  </footer>
+
   <script>
-    const SCHOOLS=[
+    var SCHOOLS = [
       {dbn:"01M015",name:"P.S. 015 Roberto Clemente",borough:"Manhattan",grades:"K-5",enrollment:190,totalBudget:3420000,perPupil:18000,titleI:680000,fsfAlloc:2200000,grants:340000,ptaFunding:78000,ptaPerPupil:411,povertyRate:82,ellRate:38,sped:22},
       {dbn:"02M047",name:"P.S. 047 John Randolph",borough:"Manhattan",grades:"K-5",enrollment:310,totalBudget:5890000,perPupil:19000,titleI:420000,fsfAlloc:4100000,grants:570000,ptaFunding:485000,ptaPerPupil:1565,povertyRate:34,ellRate:12,sped:15},
       {dbn:"07X151",name:"P.S. 151 Bronx",borough:"Bronx",grades:"K-5",enrollment:415,totalBudget:6640000,perPupil:16000,titleI:890000,fsfAlloc:4300000,grants:450000,ptaFunding:22000,ptaPerPupil:53,povertyRate:91,ellRate:42,sped:28},
@@ -144,119 +153,125 @@
       {dbn:"30Q174",name:"P.S. 174 Astoria",borough:"Queens",grades:"K-5",enrollment:410,totalBudget:7790000,perPupil:19000,titleI:340000,fsfAlloc:5600000,grants:550000,ptaFunding:380000,ptaPerPupil:927,povertyRate:30,ellRate:18,sped:11},
       {dbn:"31R034",name:"I.S. 034 Todt Hill",borough:"Staten Island",grades:"6-8",enrollment:620,totalBudget:10540000,perPupil:17000,titleI:410000,fsfAlloc:7600000,grants:730000,ptaFunding:220000,ptaPerPupil:355,povertyRate:42,ellRate:10,sped:17},
       {dbn:"05M148",name:"P.S. 148 Ruby D. Manikan",borough:"Manhattan",grades:"K-5",enrollment:225,totalBudget:4050000,perPupil:18000,titleI:750000,fsfAlloc:2500000,grants:350000,ptaFunding:48000,ptaPerPupil:213,povertyRate:79,ellRate:30,sped:19}
-      ];
+    ];
 
-    let sortCol='name',sortDir=1,filtered=[...SCHOOLS];
+    var sortCol = "name", sortDir = 1, filtered = SCHOOLS.slice();
 
-    function fmt(n){return n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'K':'$'+n}
-    function povClass(r){return r>=70?'pov-high':r>=40?'pov-mid':'pov-low'}
-
-    function updateStats(){
-        const s=filtered;
-        const avg=s.length?Math.round(s.reduce((a,b)=>a+b.perPupil,0)/s.length):0;
-        const avgPov=s.length?Math.round(s.reduce((a,b)=>a+b.povertyRate,0)/s.length):0;
-        const avgPta=s.length?Math.round(s.reduce((a,b)=>a+b.ptaPerPupil,0)/s.length):0;
-        const total=s.reduce((a,b)=>a+b.enrollment,0);
-        document.getElementById('statsRow').innerHTML=`
-            <div class="stat-card"><div class="num">${s.length}</div><div class="label">Schools Shown</div></div>
-                <div class="stat-card"><div class="num">${fmt(avg)}</div><div class="label">Avg Per-Pupil Spending</div></div>
-                    <div class="stat-card"><div class="num">${avgPov}%</div><div class="label">Avg Poverty Rate</div></div>
-                        <div class="stat-card"><div class="num">${fmt(avgPta)}</div><div class="label">Avg PTA $/Pupil</div></div>
-                            <div class="stat-card"><div class="num">${total.toLocaleString()}</div><div class="label">Total Students</div></div>
-                              `;
+    function fmt(n) {
+      return n >= 1e6 ? "$" + (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? "$" + (n / 1e3).toFixed(0) + "K" : "$" + n;
     }
 
-    function renderTable(){
-        const tbody=document.getElementById('tableBody');
-        const nr=document.getElementById('noResults');
-        if(!filtered.length){tbody.innerHTML='';nr.style.display='block';return}
-        nr.style.display='none';
-        tbody.innerHTML=filtered.map(s=>`
-            <tr onclick="showDetail('${s.dbn}')" style="cursor:pointer">
-                  <td><strong>${s.name}</strong><br><small style="color:var(--slate)">${s.dbn} &middot; ${s.grades}</small></td>
-                        <td>${s.borough}</td>
-                              <td>${s.enrollment.toLocaleString()}</td>
-                                    <td><strong>${fmt(s.perPupil)}</strong></td>
-                                          <td><span class="${povClass(s.povertyRate)}">${s.povertyRate}%</span>
-                                                  <div class="bar-wrap"><div class="bar-fill" style="width:${s.povertyRate}%;background:${s.povertyRate>=70?'var(--red)':s.povertyRate>=40?'var(--orange)':'var(--green)'}"></div></div></td>
-                                                        <td>${fmt(s.ptaPerPupil)}</td>
-                                                            </tr>
-                                                              `).join('');
+    function povClass(r) {
+      return r >= 70 ? "pov-high" : r >= 40 ? "pov-mid" : "pov-low";
     }
 
-    function applyFilters(){
-        const q=document.getElementById('search').value.toLowerCase();
-        const b=document.getElementById('boroughFilter').value;
-        const g=document.getElementById('gradeFilter').value;
-        filtered=SCHOOLS.filter(s=>{
-              if(q&&!s.name.toLowerCase().includes(q)&&!s.dbn.toLowerCase().includes(q))return false;
-              if(b&&s.borough!==b)return false;
-              if(g&&s.grades!==g)return false;
-              return true;
-        });
-        filtered.sort((a,b)=>{
-              let va=a[sortCol],vb=b[sortCol];
-              if(typeof va==='string')return va.localeCompare(vb)*sortDir;
-              return(va-vb)*sortDir;
-        });
-        updateStats();renderTable();
+    function updateStats() {
+      var len = filtered.length;
+      var avg = len ? Math.round(filtered.reduce(function(a, b) { return a + b.perPupil; }, 0) / len) : 0;
+      var avgPov = len ? Math.round(filtered.reduce(function(a, b) { return a + b.povertyRate; }, 0) / len) : 0;
+      var avgPta = len ? Math.round(filtered.reduce(function(a, b) { return a + b.ptaPerPupil; }, 0) / len) : 0;
+      var total = filtered.reduce(function(a, b) { return a + b.enrollment; }, 0);
+      var h = '<div class="stat-card"><div class="num">' + len + '</div><div class="label">Schools Shown</div></div>';
+      h += '<div class="stat-card"><div class="num">' + fmt(avg) + '</div><div class="label">Avg Per-Pupil Spending</div></div>';
+      h += '<div class="stat-card"><div class="num">' + avgPov + '%</div><div class="label">Avg Poverty Rate</div></div>';
+      h += '<div class="stat-card"><div class="num">' + fmt(avgPta) + '</div><div class="label">Avg PTA $/Pupil</div></div>';
+      h += '<div class="stat-card"><div class="num">' + total.toLocaleString() + '</div><div class="label">Total Students</div></div>';
+      document.getElementById("statsRow").innerHTML = h;
     }
 
-    document.querySelectorAll('th[data-col]').forEach(th=>{
-        th.addEventListener('click',()=>{
-              const col=th.dataset.col;
-              if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1}
-              document.querySelectorAll('th .arrow').forEach(a=>a.textContent='');
-              th.querySelector('.arrow').textContent=sortDir===1?' \u25B2':' \u25BC';
-              applyFilters();
-        });
+    function renderTable() {
+      var tbody = document.getElementById("tableBody");
+      var nr = document.getElementById("noResults");
+      if (!filtered.length) { tbody.innerHTML = ""; nr.style.display = "block"; return; }
+      nr.style.display = "none";
+      var rows = "";
+      for (var i = 0; i < filtered.length; i++) {
+        var sc = filtered[i];
+        var barColor = sc.povertyRate >= 70 ? "var(--red)" : sc.povertyRate >= 40 ? "var(--orange)" : "var(--green)";
+        rows += '<tr onclick="showDetail(\x27' + sc.dbn + '\x27)" style="cursor:pointer">';
+        rows += '<td><strong>' + sc.name + '</strong><br><small style="color:var(--slate)">' + sc.dbn + ' \u00B7 ' + sc.grades + '</small></td>';
+        rows += '<td>' + sc.borough + '</td>';
+        rows += '<td>' + sc.enrollment.toLocaleString() + '</td>';
+        rows += '<td><strong>' + fmt(sc.perPupil) + '</strong></td>';
+        rows += '<td><span class="' + povClass(sc.povertyRate) + '">' + sc.povertyRate + '%</span><div class="bar-wrap"><div class="bar-fill" style="width:' + sc.povertyRate + '%;background:' + barColor + '"></div></div></td>';
+        rows += '<td>' + fmt(sc.ptaPerPupil) + '</td></tr>';
+      }
+      tbody.innerHTML = rows;
+    }
+
+    function applyFilters() {
+      var q = document.getElementById("search").value.toLowerCase();
+      var b = document.getElementById("boroughFilter").value;
+      var g = document.getElementById("gradeFilter").value;
+      filtered = SCHOOLS.filter(function(sc) {
+        if (q && sc.name.toLowerCase().indexOf(q) === -1 && sc.dbn.toLowerCase().indexOf(q) === -1) return false;
+        if (b && sc.borough !== b) return false;
+        if (g && sc.grades !== g) return false;
+        return true;
+      });
+      filtered.sort(function(a, b) {
+        var va = a[sortCol], vb = b[sortCol];
+        if (typeof va === "string") return va.localeCompare(vb) * sortDir;
+        return (va - vb) * sortDir;
+      });
+      updateStats();
+      renderTable();
+    }
+
+    document.querySelectorAll("th[data-col]").forEach(function(th) {
+      th.addEventListener("click", function() {
+        var col = th.dataset.col;
+        if (sortCol === col) { sortDir *= -1; } else { sortCol = col; sortDir = 1; }
+        document.querySelectorAll("th .arrow").forEach(function(a) { a.textContent = ""; });
+        th.querySelector(".arrow").textContent = sortDir === 1 ? " \u25B2" : " \u25BC";
+        applyFilters();
+      });
     });
 
-    document.getElementById('search').addEventListener('input',applyFilters);
-    document.getElementById('boroughFilter').addEventListener('change',applyFilters);
-    document.getElementById('gradeFilter').addEventListener('change',applyFilters);
+    document.getElementById("search").addEventListener("input", applyFilters);
+    document.getElementById("boroughFilter").addEventListener("change", applyFilters);
+    document.getElementById("gradeFilter").addEventListener("change", applyFilters);
 
-    function showDetail(dbn){
-        const s=SCHOOLS.find(x=>x.dbn===dbn);if(!s)return;
-        const cityAvg=Math.round(SCHOOLS.reduce((a,b)=>a+b.perPupil,0)/SCHOOLS.length);
-        const diff=s.perPupil-cityAvg;
-        const maxBudget=Math.max(s.fsfAlloc,s.titleI,s.grants,s.ptaFunding);
-        document.getElementById('modalContent').innerHTML=`
-            <h2>${s.name}</h2>
-                <p style="color:var(--slate);margin-bottom:.5rem">${s.dbn} &middot; ${s.borough} &middot; Grades ${s.grades}</p>
-                    <p style="color:var(--slate);font-size:.85rem;margin-bottom:1rem">${diff>=0?'$'+diff.toLocaleString()+' above':'$'+Math.abs(diff).toLocaleString()+' below'} city average per-pupil spending</p>
-                        <div class="detail-grid">
-                              <div class="detail-item"><div class="d-label">Total Budget</div><div class="d-value">${fmt(s.totalBudget)}</div></div>
-                                    <div class="detail-item"><div class="d-label">Per-Pupil</div><div class="d-value">${fmt(s.perPupil)}</div></div>
-                                          <div class="detail-item"><div class="d-label">Enrollment</div><div class="d-value">${s.enrollment.toLocaleString()}</div></div>
-                                                <div class="detail-item"><div class="d-label">Poverty Rate</div><div class="d-value" style="color:${s.povertyRate>=70?'var(--red)':s.povertyRate>=40?'var(--orange)':'var(--green)'}">${s.povertyRate}%</div></div>
-                                                    </div>
-                                                        <h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Funding Breakdown</h3>
-                                                            <div class="chart-bar"><span class="cb-label">FSF</span><div class="cb-track"><div class="cb-fill" style="width:${(s.fsfAlloc/maxBudget*100)}%;background:var(--accent)"></div></div><span class="cb-val">${fmt(s.fsfAlloc)}</span></div>
-                                                                <div class="chart-bar"><span class="cb-label">Title I</span><div class="cb-track"><div class="cb-fill" style="width:${(s.titleI/maxBudget*100)}%;background:var(--green)"></div></div><span class="cb-val">${fmt(s.titleI)}</span></div>
-                                                                    <div class="chart-bar"><span class="cb-label">Grants</span><div class="cb-track"><div class="cb-fill" style="width:${(s.grants/maxBudget*100)}%;background:var(--orange)"></div></div><span class="cb-val">${fmt(s.grants)}</span></div>
-                                                                        <div class="chart-bar"><span class="cb-label">PTA</span><div class="cb-track"><div class="cb-fill" style="width:${(s.ptaFunding/maxBudget*100)}%;background:#8b5cf6"></div></div><span class="cb-val">${fmt(s.ptaFunding)}</span></div>
-                                                                            <h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Demographics</h3>
-                                                                                <div class="chart-bar"><span class="cb-label">Poverty</span><div class="cb-track"><div class="cb-fill" style="width:${s.povertyRate}%;background:var(--red)"></div></div><span class="cb-val">${s.povertyRate}%</span></div>
-                                                                                    <div class="chart-bar"><span class="cb-label">ELL</span><div class="cb-track"><div class="cb-fill" style="width:${s.ellRate}%;background:var(--accent)"></div></div><span class="cb-val">${s.ellRate}%</span></div>
-                                                                                        <div class="chart-bar"><span class="cb-label">SpEd</span><div class="cb-track"><div class="cb-fill" style="width:${s.sped}%;background:var(--orange)"></div></div><span class="cb-val">${s.sped}%</span></div>
-                                                                                          `;
-        document.getElementById('modal').classList.add('active');
+    function showDetail(dbn) {
+      var sc = SCHOOLS.find(function(x) { return x.dbn === dbn; });
+      if (!sc) return;
+      var cityAvg = Math.round(SCHOOLS.reduce(function(a, b) { return a + b.perPupil; }, 0) / SCHOOLS.length);
+      var diff = sc.perPupil - cityAvg;
+      var maxB = Math.max(sc.fsfAlloc, sc.titleI, sc.grants, sc.ptaFunding);
+      var diffText = diff >= 0 ? "$" + diff.toLocaleString() + " above" : "$" + Math.abs(diff).toLocaleString() + " below";
+      var povColor = sc.povertyRate >= 70 ? "var(--red)" : sc.povertyRate >= 40 ? "var(--orange)" : "var(--green)";
+      var h = '<h2>' + sc.name + '</h2>';
+      h += '<p style="color:var(--slate);margin-bottom:.5rem">' + sc.dbn + ' \u00B7 ' + sc.borough + ' \u00B7 Grades ' + sc.grades + '</p>';
+      h += '<p style="color:var(--slate);font-size:.85rem;margin-bottom:1rem">' + diffText + ' city average per-pupil spending</p>';
+      h += '<div class="detail-grid">';
+      h += '<div class="detail-item"><div class="d-label">Total Budget</div><div class="d-value">' + fmt(sc.totalBudget) + '</div></div>';
+      h += '<div class="detail-item"><div class="d-label">Per-Pupil</div><div class="d-value">' + fmt(sc.perPupil) + '</div></div>';
+      h += '<div class="detail-item"><div class="d-label">Enrollment</div><div class="d-value">' + sc.enrollment.toLocaleString() + '</div></div>';
+      h += '<div class="detail-item"><div class="d-label">Poverty Rate</div><div class="d-value" style="color:' + povColor + '">' + sc.povertyRate + '%</div></div>';
+      h += '</div>';
+      h += '<h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Funding Breakdown</h3>';
+      h += '<div class="chart-bar"><span class="cb-label">FSF</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.fsfAlloc/maxB*100) + '%;background:var(--accent)"></div></div><span class="cb-val">' + fmt(sc.fsfAlloc) + '</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">Title I</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.titleI/maxB*100) + '%;background:var(--green)"></div></div><span class="cb-val">' + fmt(sc.titleI) + '</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">Grants</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.grants/maxB*100) + '%;background:var(--orange)"></div></div><span class="cb-val">' + fmt(sc.grants) + '</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">PTA</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.ptaFunding/maxB*100) + '%;background:#8b5cf6"></div></div><span class="cb-val">' + fmt(sc.ptaFunding) + '</span></div>';
+      h += '<h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Demographics</h3>';
+      h += '<div class="chart-bar"><span class="cb-label">Poverty</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.povertyRate + '%;background:var(--red)"></div></div><span class="cb-val">' + sc.povertyRate + '%</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">ELL</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.ellRate + '%;background:var(--accent)"></div></div><span class="cb-val">' + sc.ellRate + '%</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">SpEd</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.sped + '%;background:var(--orange)"></div></div><span class="cb-val">' + sc.sped + '%</span></div>';
+      document.getElementById("modalContent").innerHTML = h;
+      document.getElementById("modal").classList.add("active");
     }
 
-    document.getElementById('modalClose').addEventListener('click',()=>document.getElementById('modal').classList.remove('active'));
-    document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById('modal').classList.remove('active')});
+    document.getElementById("modalClose").addEventListener("click", function() {
+      document.getElementById("modal").classList.remove("active");
+    });
+
+    document.getElementById("modal").addEventListener("click", function(e) {
+      if (e.target === e.currentTarget) document.getElementById("modal").classList.remove("active");
+    });
 
     applyFilters();
   </script>
-  </body>
-</html>html>
-  </script></p>
-      </footer>
-                          </tr>
-                </thead>
-        </table></h1></span>
-      </header>
-  </body>
-    </style></title>
-  </head>
+
+</body>
+</html>
