@@ -5,62 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NYC School Budget Tracker — CivicByte</title>
   <meta name="description" content="Interactive dashboard exploring per-pupil spending, Title I funding, and PTA contributions across NYC public schools.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --ink: #0f172a; --slate: #475569; --mist: #f8fafc;
-      --accent: #2563eb; --accent-light: #dbeafe; --white: #ffffff;
-      --border: #e2e8f0; --green: #16a34a; --red: #dc2626; --orange: #ea580c;
+      --ink: #0a0a1a; --body: #0f1117; --slate: #94a3b8; --light: #cbd5e1;
+      --blue: #3b82f6; --blue-bright: #60a5fa; --indigo: #6366f1; --violet: #8b5cf6;
+      --emerald: #10b981; --amber: #f59e0b; --rose: #f43f5e;
+      --surface: #111827; --surface2: #1e293b; --border: #334155;
+      --white: #f8fafc;
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; color: var(--ink); background: var(--mist); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    body { font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif; color: var(--white); background: var(--body); line-height: 1.5; -webkit-font-smoothing: antialiased; }
     a { text-decoration: none; color: inherit; }
-    header { background: var(--white); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
+    header { background: var(--ink); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
     .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-weight: 800; font-size: 1.15rem; }
-    .logo em { font-style: normal; color: var(--accent); }
-    .badge { background: var(--accent-light); color: var(--accent); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px; }
+    .logo { font-weight: 800; font-size: 1.2rem; }
+    .logo span { background: linear-gradient(135deg, var(--blue), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .badge { background: rgba(99,102,241,0.15); color: var(--blue-bright); font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 8px; border: 1px solid rgba(99,102,241,0.3); }
     .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
     h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.25rem; }
     .subtitle { color: var(--slate); margin-bottom: 2rem; font-size: 0.95rem; }
     .controls { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
-    .search-box { flex: 1; min-width: 250px; padding: 0.7rem 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: var(--white); transition: border 0.2s; }
-    .search-box:focus { outline: none; border-color: var(--accent); }
-    select { padding: 0.7rem 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: var(--white); cursor: pointer; }
+    .search-box { flex: 1; min-width: 250px; padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; background: var(--surface); color: var(--white); transition: border 0.2s; }
+    .search-box:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+    .search-box::placeholder { color: var(--slate); }
+    select { padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem; background: var(--surface); color: var(--white); cursor: pointer; }
     .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-    .stat-card { background: var(--white); border-radius: 10px; padding: 1.25rem; text-align: center; border: 1px solid var(--border); }
-    .stat-card .num { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
-    .stat-card .label { color: var(--slate); font-size: 0.8rem; margin-top: 0.15rem; }
-    table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
-    thead { background: var(--ink); color: var(--white); }
-    th { padding: 0.8rem 1rem; text-align: left; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; user-select: none; }
-    th:hover { background: #1e293b; }
+    .stat-card { background: var(--surface); border-radius: 12px; padding: 1.25rem; text-align: center; border: 1px solid var(--border); }
+    .stat-card .num { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, var(--blue-bright), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-card .label { color: var(--slate); font-size: 0.78rem; margin-top: 0.15rem; font-weight: 500; }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    thead { background: var(--surface2); }
+    th { padding: 0.8rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; cursor: pointer; user-select: none; color: var(--slate); }
+    th:hover { color: var(--white); }
     th .arrow { margin-left: 0.3rem; font-size: 0.7rem; }
     td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-    tr:hover td { background: var(--accent-light); }
-    .pov-high { color: var(--red); font-weight: 600; }
-    .pov-mid { color: var(--orange); font-weight: 600; }
-    .pov-low { color: var(--green); font-weight: 600; }
-    .bar-wrap { width: 100%; height: 6px; background: #e5e5e5; border-radius: 4px; overflow: hidden; margin-top: 0.25rem; }
+    tr:hover td { background: rgba(59,130,246,0.06); }
+    .pov-high { color: var(--rose); font-weight: 600; }
+    .pov-mid { color: var(--amber); font-weight: 600; }
+    .pov-low { color: var(--emerald); font-weight: 600; }
+    .bar-wrap { width: 100%; height: 4px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-top: 0.3rem; }
     .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; }
     .modal-overlay.active { display: flex; }
-    .modal { background: var(--white); border-radius: 16px; padding: 2.5rem; max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; }
     .modal h2 { font-size: 1.4rem; margin-bottom: 0.25rem; }
     .modal .close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--slate); }
-    .modal .close:hover { color: var(--ink); }
+    .modal .close:hover { color: var(--white); }
     .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
-    .detail-item { background: var(--mist); padding: 1rem; border-radius: 8px; }
-    .detail-item .d-label { font-size: 0.75rem; color: var(--slate); text-transform: uppercase; letter-spacing: 0.04em; }
+    .detail-item { background: var(--surface2); padding: 1rem; border-radius: 10px; }
+    .detail-item .d-label { font-size: 0.72rem; color: var(--slate); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
     .detail-item .d-value { font-size: 1.3rem; font-weight: 700; margin-top: 0.15rem; }
     .chart-bar { display: flex; align-items: center; gap: 0.5rem; margin: 0.4rem 0; }
     .chart-bar .cb-label { width: 80px; font-size: 0.8rem; color: var(--slate); text-align: right; }
-    .chart-bar .cb-track { flex: 1; height: 20px; background: #e5e5e5; border-radius: 4px; overflow: hidden; }
-    .chart-bar .cb-fill { height: 100%; border-radius: 4px; }
+    .chart-bar .cb-track { flex: 1; height: 20px; background: var(--surface2); border-radius: 6px; overflow: hidden; }
+    .chart-bar .cb-fill { height: 100%; border-radius: 6px; }
     .chart-bar .cb-val { width: 60px; font-size: 0.8rem; font-weight: 600; }
     .no-results { text-align: center; padding: 3rem; color: var(--slate); }
-    footer { text-align: center; padding: 2rem; color: var(--slate); font-size: 0.8rem; }
-    footer a { color: var(--accent); }
-    footer a:hover { text-decoration: underline; }
+    footer { text-align: center; padding: 2rem; color: var(--slate); font-size: 0.8rem; border-top: 1px solid var(--border); }
+    footer a { color: var(--blue-bright); }
+    footer a:hover { color: var(--white); }
     @media (max-width: 768px) {
       .controls { flex-direction: column; }
       .detail-grid { grid-template-columns: 1fr; }
@@ -72,7 +78,7 @@
 
   <header>
     <div class="header-inner">
-      <a href="https://civicbyte.dev" class="logo">Civic<em>Byte</em></a>
+      <a href="https://civicbyte.dev" class="logo">Civic<span>Byte</span></a>
       <span class="badge">NYC School Budget Tracker</span>
     </div>
   </header>
@@ -187,7 +193,7 @@
       var rows = "";
       for (var i = 0; i < filtered.length; i++) {
         var sc = filtered[i];
-        var barColor = sc.povertyRate >= 70 ? "var(--red)" : sc.povertyRate >= 40 ? "var(--orange)" : "var(--green)";
+        var barColor = sc.povertyRate >= 70 ? "var(--rose)" : sc.povertyRate >= 40 ? "var(--amber)" : "var(--emerald)";
         rows += '<tr onclick="showDetail(\x27' + sc.dbn + '\x27)" style="cursor:pointer">';
         rows += '<td><strong>' + sc.name + '</strong><br><small style="color:var(--slate)">' + sc.dbn + ' \u00B7 ' + sc.grades + '</small></td>';
         rows += '<td>' + sc.borough + '</td>';
@@ -239,7 +245,7 @@
       var diff = sc.perPupil - cityAvg;
       var maxB = Math.max(sc.fsfAlloc, sc.titleI, sc.grants, sc.ptaFunding);
       var diffText = diff >= 0 ? "$" + diff.toLocaleString() + " above" : "$" + Math.abs(diff).toLocaleString() + " below";
-      var povColor = sc.povertyRate >= 70 ? "var(--red)" : sc.povertyRate >= 40 ? "var(--orange)" : "var(--green)";
+      var povColor = sc.povertyRate >= 70 ? "var(--rose)" : sc.povertyRate >= 40 ? "var(--amber)" : "var(--emerald)";
       var h = '<h2>' + sc.name + '</h2>';
       h += '<p style="color:var(--slate);margin-bottom:.5rem">' + sc.dbn + ' \u00B7 ' + sc.borough + ' \u00B7 Grades ' + sc.grades + '</p>';
       h += '<p style="color:var(--slate);font-size:.85rem;margin-bottom:1rem">' + diffText + ' city average per-pupil spending</p>';
@@ -250,14 +256,14 @@
       h += '<div class="detail-item"><div class="d-label">Poverty Rate</div><div class="d-value" style="color:' + povColor + '">' + sc.povertyRate + '%</div></div>';
       h += '</div>';
       h += '<h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Funding Breakdown</h3>';
-      h += '<div class="chart-bar"><span class="cb-label">FSF</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.fsfAlloc/maxB*100) + '%;background:var(--accent)"></div></div><span class="cb-val">' + fmt(sc.fsfAlloc) + '</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">Title I</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.titleI/maxB*100) + '%;background:var(--green)"></div></div><span class="cb-val">' + fmt(sc.titleI) + '</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">Grants</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.grants/maxB*100) + '%;background:var(--orange)"></div></div><span class="cb-val">' + fmt(sc.grants) + '</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">PTA</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.ptaFunding/maxB*100) + '%;background:#8b5cf6"></div></div><span class="cb-val">' + fmt(sc.ptaFunding) + '</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">FSF</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.fsfAlloc/maxB*100) + '%;background:var(--blue)"></div></div><span class="cb-val">' + fmt(sc.fsfAlloc) + '</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">Title I</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.titleI/maxB*100) + '%;background:var(--emerald)"></div></div><span class="cb-val">' + fmt(sc.titleI) + '</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">Grants</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.grants/maxB*100) + '%;background:var(--amber)"></div></div><span class="cb-val">' + fmt(sc.grants) + '</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">PTA</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.ptaFunding/maxB*100) + '%;background:var(--violet)"></div></div><span class="cb-val">' + fmt(sc.ptaFunding) + '</span></div>';
       h += '<h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Demographics</h3>';
-      h += '<div class="chart-bar"><span class="cb-label">Poverty</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.povertyRate + '%;background:var(--red)"></div></div><span class="cb-val">' + sc.povertyRate + '%</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">ELL</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.ellRate + '%;background:var(--accent)"></div></div><span class="cb-val">' + sc.ellRate + '%</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">SpEd</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.sped + '%;background:var(--orange)"></div></div><span class="cb-val">' + sc.sped + '%</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">Poverty</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.povertyRate + '%;background:var(--rose)"></div></div><span class="cb-val">' + sc.povertyRate + '%</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">ELL</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.ellRate + '%;background:var(--blue)"></div></div><span class="cb-val">' + sc.ellRate + '%</span></div>';
+      h += '<div class="chart-bar"><span class="cb-label">SpEd</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.sped + '%;background:var(--amber)"></div></div><span class="cb-val">' + sc.sped + '%</span></div>';
       document.getElementById("modalContent").innerHTML = h;
       document.getElementById("modal").classList.add("active");
     }
