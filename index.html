@@ -7,66 +7,68 @@
   <meta name="description" content="Interactive dashboard exploring per-pupil spending, Title I funding, and PTA contributions across NYC public schools.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --ink: #0a0a1a; --body: #0f1117; --slate: #94a3b8; --light: #cbd5e1;
-      --blue: #3b82f6; --blue-bright: #60a5fa; --indigo: #6366f1; --violet: #8b5cf6;
+      --bg: #0a0e27; --surface: #101535; --surface2: #161b42;
+      --border: #1e2558; --border-light: #2a3170;
+      --teal: #0ef6cc; --teal-dim: #0bbf9e; --teal-glow: rgba(14,246,204,0.15);
+      --coral: #ff6b6b; --lavender: #a78bfa;
       --emerald: #10b981; --amber: #f59e0b; --rose: #f43f5e;
-      --surface: #111827; --surface2: #1e293b; --border: #334155;
-      --white: #f8fafc;
+      --text: #e2e8f0; --muted: #7a82a6; --white: #f8fafc;
     }
-    body { font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif; color: var(--white); background: var(--body); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    body { font-family: "DM Sans", sans-serif; color: var(--text); background: var(--bg); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    h1, h2, h3, .logo, .stat-card .num { font-family: "Space Grotesk", sans-serif; }
     a { text-decoration: none; color: inherit; }
-    header { background: var(--ink); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
     .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-weight: 800; font-size: 1.2rem; }
-    .logo span { background: linear-gradient(135deg, var(--blue), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .badge { background: rgba(99,102,241,0.15); color: var(--blue-bright); font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 8px; border: 1px solid rgba(99,102,241,0.3); }
+    .logo { font-weight: 700; font-size: 1.3rem; letter-spacing: -0.04em; }
+    .logo span { color: var(--teal); }
+    .badge { background: rgba(14,246,204,0.1); color: var(--teal); font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 8px; border: 1px solid rgba(14,246,204,0.2); font-family: "Space Grotesk", sans-serif; }
     .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-    h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.25rem; }
-    .subtitle { color: var(--slate); margin-bottom: 2rem; font-size: 0.95rem; }
+    h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
     .controls { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
-    .search-box { flex: 1; min-width: 250px; padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; background: var(--surface); color: var(--white); transition: border 0.2s; }
-    .search-box:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
-    .search-box::placeholder { color: var(--slate); }
-    select { padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem; background: var(--surface); color: var(--white); cursor: pointer; }
+    .search-box { flex: 1; min-width: 250px; padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; background: var(--surface); color: var(--white); transition: border 0.2s; font-family: "DM Sans", sans-serif; }
+    .search-box:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-glow); }
+    .search-box::placeholder { color: var(--muted); }
+    select { padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem; background: var(--surface); color: var(--white); cursor: pointer; font-family: "DM Sans", sans-serif; }
     .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
     .stat-card { background: var(--surface); border-radius: 12px; padding: 1.25rem; text-align: center; border: 1px solid var(--border); }
-    .stat-card .num { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, var(--blue-bright), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .stat-card .label { color: var(--slate); font-size: 0.78rem; margin-top: 0.15rem; font-weight: 500; }
+    .stat-card .num { font-size: 1.8rem; font-weight: 700; color: var(--teal); }
+    .stat-card .label { color: var(--muted); font-size: 0.78rem; margin-top: 0.15rem; font-weight: 500; }
     table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
     thead { background: var(--surface2); }
-    th { padding: 0.8rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; cursor: pointer; user-select: none; color: var(--slate); }
-    th:hover { color: var(--white); }
+    th { padding: 0.8rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; cursor: pointer; user-select: none; color: var(--muted); font-family: "Space Grotesk", sans-serif; }
+    th:hover { color: var(--teal); }
     th .arrow { margin-left: 0.3rem; font-size: 0.7rem; }
     td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-    tr:hover td { background: rgba(59,130,246,0.06); }
+    tr:hover td { background: rgba(14,246,204,0.04); }
     .pov-high { color: var(--rose); font-weight: 600; }
     .pov-mid { color: var(--amber); font-weight: 600; }
     .pov-low { color: var(--emerald); font-weight: 600; }
     .bar-wrap { width: 100%; height: 4px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-top: 0.3rem; }
     .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,14,39,0.8); backdrop-filter: blur(8px); z-index: 100; align-items: center; justify-content: center; }
     .modal-overlay.active { display: flex; }
-    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; }
     .modal h2 { font-size: 1.4rem; margin-bottom: 0.25rem; }
-    .modal .close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--slate); }
-    .modal .close:hover { color: var(--white); }
+    .modal .close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--muted); }
+    .modal .close:hover { color: var(--teal); }
     .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
-    .detail-item { background: var(--surface2); padding: 1rem; border-radius: 10px; }
-    .detail-item .d-label { font-size: 0.72rem; color: var(--slate); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-    .detail-item .d-value { font-size: 1.3rem; font-weight: 700; margin-top: 0.15rem; }
+    .detail-item { background: var(--surface2); padding: 1rem; border-radius: 10px; border: 1px solid var(--border); }
+    .detail-item .d-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; font-family: "Space Grotesk", sans-serif; }
+    .detail-item .d-value { font-size: 1.3rem; font-weight: 700; margin-top: 0.15rem; font-family: "Space Grotesk", sans-serif; }
     .chart-bar { display: flex; align-items: center; gap: 0.5rem; margin: 0.4rem 0; }
-    .chart-bar .cb-label { width: 80px; font-size: 0.8rem; color: var(--slate); text-align: right; }
+    .chart-bar .cb-label { width: 80px; font-size: 0.8rem; color: var(--muted); text-align: right; }
     .chart-bar .cb-track { flex: 1; height: 20px; background: var(--surface2); border-radius: 6px; overflow: hidden; }
     .chart-bar .cb-fill { height: 100%; border-radius: 6px; }
-    .chart-bar .cb-val { width: 60px; font-size: 0.8rem; font-weight: 600; }
-    .no-results { text-align: center; padding: 3rem; color: var(--slate); }
-    footer { text-align: center; padding: 2rem; color: var(--slate); font-size: 0.8rem; border-top: 1px solid var(--border); }
-    footer a { color: var(--blue-bright); }
-    footer a:hover { color: var(--white); }
+    .chart-bar .cb-val { width: 60px; font-size: 0.8rem; font-weight: 600; font-family: "Space Grotesk", sans-serif; }
+    .no-results { text-align: center; padding: 3rem; color: var(--muted); }
+    footer { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
+    footer a { color: var(--teal); }
+    footer a:hover { opacity: 0.8; }
     @media (max-width: 768px) {
       .controls { flex-direction: column; }
       .detail-grid { grid-template-columns: 1fr; }
@@ -78,7 +80,7 @@
 
   <header>
     <div class="header-inner">
-      <a href="https://civicbyte.dev" class="logo">Civic<span>Byte</span></a>
+      <a href="https://civicbyte.dev" class="logo">civic<span>byte</span></a>
       <span class="badge">NYC School Budget Tracker</span>
     </div>
   </header>
@@ -162,120 +164,51 @@
     ];
 
     var sortCol = "name", sortDir = 1, filtered = SCHOOLS.slice();
-
-    function fmt(n) {
-      return n >= 1e6 ? "$" + (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? "$" + (n / 1e3).toFixed(0) + "K" : "$" + n;
-    }
-
-    function povClass(r) {
-      return r >= 70 ? "pov-high" : r >= 40 ? "pov-mid" : "pov-low";
-    }
-
+    function fmt(n) { return n >= 1e6 ? "$" + (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? "$" + (n / 1e3).toFixed(0) + "K" : "$" + n; }
+    function povClass(r) { return r >= 70 ? "pov-high" : r >= 40 ? "pov-mid" : "pov-low"; }
     function updateStats() {
-      var len = filtered.length;
-      var avg = len ? Math.round(filtered.reduce(function(a, b) { return a + b.perPupil; }, 0) / len) : 0;
-      var avgPov = len ? Math.round(filtered.reduce(function(a, b) { return a + b.povertyRate; }, 0) / len) : 0;
-      var avgPta = len ? Math.round(filtered.reduce(function(a, b) { return a + b.ptaPerPupil; }, 0) / len) : 0;
-      var total = filtered.reduce(function(a, b) { return a + b.enrollment; }, 0);
-      var h = '<div class="stat-card"><div class="num">' + len + '</div><div class="label">Schools Shown</div></div>';
-      h += '<div class="stat-card"><div class="num">' + fmt(avg) + '</div><div class="label">Avg Per-Pupil Spending</div></div>';
-      h += '<div class="stat-card"><div class="num">' + avgPov + '%</div><div class="label">Avg Poverty Rate</div></div>';
-      h += '<div class="stat-card"><div class="num">' + fmt(avgPta) + '</div><div class="label">Avg PTA $/Pupil</div></div>';
-      h += '<div class="stat-card"><div class="num">' + total.toLocaleString() + '</div><div class="label">Total Students</div></div>';
-      document.getElementById("statsRow").innerHTML = h;
+      var len = filtered.length, avg = len ? Math.round(filtered.reduce(function(a,b){return a+b.perPupil},0)/len) : 0, avgPov = len ? Math.round(filtered.reduce(function(a,b){return a+b.povertyRate},0)/len) : 0, avgPta = len ? Math.round(filtered.reduce(function(a,b){return a+b.ptaPerPupil},0)/len) : 0, total = filtered.reduce(function(a,b){return a+b.enrollment},0);
+      document.getElementById("statsRow").innerHTML = '<div class="stat-card"><div class="num">'+len+'</div><div class="label">Schools Shown</div></div><div class="stat-card"><div class="num">'+fmt(avg)+'</div><div class="label">Avg Per-Pupil Spending</div></div><div class="stat-card"><div class="num">'+avgPov+'%</div><div class="label">Avg Poverty Rate</div></div><div class="stat-card"><div class="num">'+fmt(avgPta)+'</div><div class="label">Avg PTA $/Pupil</div></div><div class="stat-card"><div class="num">'+total.toLocaleString()+'</div><div class="label">Total Students</div></div>';
     }
-
     function renderTable() {
-      var tbody = document.getElementById("tableBody");
-      var nr = document.getElementById("noResults");
+      var tbody = document.getElementById("tableBody"), nr = document.getElementById("noResults");
       if (!filtered.length) { tbody.innerHTML = ""; nr.style.display = "block"; return; }
-      nr.style.display = "none";
-      var rows = "";
-      for (var i = 0; i < filtered.length; i++) {
-        var sc = filtered[i];
-        var barColor = sc.povertyRate >= 70 ? "var(--rose)" : sc.povertyRate >= 40 ? "var(--amber)" : "var(--emerald)";
-        rows += '<tr onclick="showDetail(\x27' + sc.dbn + '\x27)" style="cursor:pointer">';
-        rows += '<td><strong>' + sc.name + '</strong><br><small style="color:var(--slate)">' + sc.dbn + ' \u00B7 ' + sc.grades + '</small></td>';
-        rows += '<td>' + sc.borough + '</td>';
-        rows += '<td>' + sc.enrollment.toLocaleString() + '</td>';
-        rows += '<td><strong>' + fmt(sc.perPupil) + '</strong></td>';
-        rows += '<td><span class="' + povClass(sc.povertyRate) + '">' + sc.povertyRate + '%</span><div class="bar-wrap"><div class="bar-fill" style="width:' + sc.povertyRate + '%;background:' + barColor + '"></div></div></td>';
-        rows += '<td>' + fmt(sc.ptaPerPupil) + '</td></tr>';
-      }
+      nr.style.display = "none"; var rows = "";
+      for (var i = 0; i < filtered.length; i++) { var sc = filtered[i], barColor = sc.povertyRate >= 70 ? "var(--rose)" : sc.povertyRate >= 40 ? "var(--amber)" : "var(--emerald)";
+        rows += '<tr onclick="showDetail(\x27'+sc.dbn+'\x27)" style="cursor:pointer"><td><strong>'+sc.name+'</strong><br><small style="color:var(--muted)">'+sc.dbn+' \u00B7 '+sc.grades+'</small></td><td>'+sc.borough+'</td><td>'+sc.enrollment.toLocaleString()+'</td><td><strong>'+fmt(sc.perPupil)+'</strong></td><td><span class="'+povClass(sc.povertyRate)+'">'+sc.povertyRate+'%</span><div class="bar-wrap"><div class="bar-fill" style="width:'+sc.povertyRate+'%;background:'+barColor+'"></div></div></td><td>'+fmt(sc.ptaPerPupil)+'</td></tr>'; }
       tbody.innerHTML = rows;
     }
-
     function applyFilters() {
-      var q = document.getElementById("search").value.toLowerCase();
-      var b = document.getElementById("boroughFilter").value;
-      var g = document.getElementById("gradeFilter").value;
-      filtered = SCHOOLS.filter(function(sc) {
-        if (q && sc.name.toLowerCase().indexOf(q) === -1 && sc.dbn.toLowerCase().indexOf(q) === -1) return false;
-        if (b && sc.borough !== b) return false;
-        if (g && sc.grades !== g) return false;
-        return true;
-      });
-      filtered.sort(function(a, b) {
-        var va = a[sortCol], vb = b[sortCol];
-        if (typeof va === "string") return va.localeCompare(vb) * sortDir;
-        return (va - vb) * sortDir;
-      });
-      updateStats();
-      renderTable();
+      var q = document.getElementById("search").value.toLowerCase(), b = document.getElementById("boroughFilter").value, g = document.getElementById("gradeFilter").value;
+      filtered = SCHOOLS.filter(function(sc) { if (q && sc.name.toLowerCase().indexOf(q)===-1 && sc.dbn.toLowerCase().indexOf(q)===-1) return false; if (b && sc.borough!==b) return false; if (g && sc.grades!==g) return false; return true; });
+      filtered.sort(function(a,b) { var va=a[sortCol],vb=b[sortCol]; if (typeof va==="string") return va.localeCompare(vb)*sortDir; return (va-vb)*sortDir; });
+      updateStats(); renderTable();
     }
-
-    document.querySelectorAll("th[data-col]").forEach(function(th) {
-      th.addEventListener("click", function() {
-        var col = th.dataset.col;
-        if (sortCol === col) { sortDir *= -1; } else { sortCol = col; sortDir = 1; }
-        document.querySelectorAll("th .arrow").forEach(function(a) { a.textContent = ""; });
-        th.querySelector(".arrow").textContent = sortDir === 1 ? " \u25B2" : " \u25BC";
-        applyFilters();
-      });
-    });
-
+    document.querySelectorAll("th[data-col]").forEach(function(th) { th.addEventListener("click", function() { var col=th.dataset.col; if(sortCol===col){sortDir*=-1}else{sortCol=col;sortDir=1} document.querySelectorAll("th .arrow").forEach(function(a){a.textContent=""}); th.querySelector(".arrow").textContent=sortDir===1?" \u25B2":" \u25BC"; applyFilters(); }); });
     document.getElementById("search").addEventListener("input", applyFilters);
     document.getElementById("boroughFilter").addEventListener("change", applyFilters);
     document.getElementById("gradeFilter").addEventListener("change", applyFilters);
-
     function showDetail(dbn) {
-      var sc = SCHOOLS.find(function(x) { return x.dbn === dbn; });
-      if (!sc) return;
-      var cityAvg = Math.round(SCHOOLS.reduce(function(a, b) { return a + b.perPupil; }, 0) / SCHOOLS.length);
-      var diff = sc.perPupil - cityAvg;
-      var maxB = Math.max(sc.fsfAlloc, sc.titleI, sc.grants, sc.ptaFunding);
-      var diffText = diff >= 0 ? "$" + diff.toLocaleString() + " above" : "$" + Math.abs(diff).toLocaleString() + " below";
-      var povColor = sc.povertyRate >= 70 ? "var(--rose)" : sc.povertyRate >= 40 ? "var(--amber)" : "var(--emerald)";
-      var h = '<h2>' + sc.name + '</h2>';
-      h += '<p style="color:var(--slate);margin-bottom:.5rem">' + sc.dbn + ' \u00B7 ' + sc.borough + ' \u00B7 Grades ' + sc.grades + '</p>';
-      h += '<p style="color:var(--slate);font-size:.85rem;margin-bottom:1rem">' + diffText + ' city average per-pupil spending</p>';
-      h += '<div class="detail-grid">';
-      h += '<div class="detail-item"><div class="d-label">Total Budget</div><div class="d-value">' + fmt(sc.totalBudget) + '</div></div>';
-      h += '<div class="detail-item"><div class="d-label">Per-Pupil</div><div class="d-value">' + fmt(sc.perPupil) + '</div></div>';
-      h += '<div class="detail-item"><div class="d-label">Enrollment</div><div class="d-value">' + sc.enrollment.toLocaleString() + '</div></div>';
-      h += '<div class="detail-item"><div class="d-label">Poverty Rate</div><div class="d-value" style="color:' + povColor + '">' + sc.povertyRate + '%</div></div>';
-      h += '</div>';
-      h += '<h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Funding Breakdown</h3>';
-      h += '<div class="chart-bar"><span class="cb-label">FSF</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.fsfAlloc/maxB*100) + '%;background:var(--blue)"></div></div><span class="cb-val">' + fmt(sc.fsfAlloc) + '</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">Title I</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.titleI/maxB*100) + '%;background:var(--emerald)"></div></div><span class="cb-val">' + fmt(sc.titleI) + '</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">Grants</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.grants/maxB*100) + '%;background:var(--amber)"></div></div><span class="cb-val">' + fmt(sc.grants) + '</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">PTA</span><div class="cb-track"><div class="cb-fill" style="width:' + (sc.ptaFunding/maxB*100) + '%;background:var(--violet)"></div></div><span class="cb-val">' + fmt(sc.ptaFunding) + '</span></div>';
-      h += '<h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Demographics</h3>';
-      h += '<div class="chart-bar"><span class="cb-label">Poverty</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.povertyRate + '%;background:var(--rose)"></div></div><span class="cb-val">' + sc.povertyRate + '%</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">ELL</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.ellRate + '%;background:var(--blue)"></div></div><span class="cb-val">' + sc.ellRate + '%</span></div>';
-      h += '<div class="chart-bar"><span class="cb-label">SpEd</span><div class="cb-track"><div class="cb-fill" style="width:' + sc.sped + '%;background:var(--amber)"></div></div><span class="cb-val">' + sc.sped + '%</span></div>';
-      document.getElementById("modalContent").innerHTML = h;
+      var sc=SCHOOLS.find(function(x){return x.dbn===dbn}); if(!sc) return;
+      var cityAvg=Math.round(SCHOOLS.reduce(function(a,b){return a+b.perPupil},0)/SCHOOLS.length), diff=sc.perPupil-cityAvg, maxB=Math.max(sc.fsfAlloc,sc.titleI,sc.grants,sc.ptaFunding);
+      var diffText=diff>=0?"$"+diff.toLocaleString()+" above":"$"+Math.abs(diff).toLocaleString()+" below";
+      var povColor=sc.povertyRate>=70?"var(--rose)":sc.povertyRate>=40?"var(--amber)":"var(--emerald)";
+      var h='<h2>'+sc.name+'</h2><p style="color:var(--muted);margin-bottom:.5rem">'+sc.dbn+' \u00B7 '+sc.borough+' \u00B7 Grades '+sc.grades+'</p><p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem">'+diffText+' city average per-pupil spending</p>';
+      h+='<div class="detail-grid"><div class="detail-item"><div class="d-label">Total Budget</div><div class="d-value">'+fmt(sc.totalBudget)+'</div></div><div class="detail-item"><div class="d-label">Per-Pupil</div><div class="d-value">'+fmt(sc.perPupil)+'</div></div><div class="detail-item"><div class="d-label">Enrollment</div><div class="d-value">'+sc.enrollment.toLocaleString()+'</div></div><div class="detail-item"><div class="d-label">Poverty Rate</div><div class="d-value" style="color:'+povColor+'">'+sc.povertyRate+'%</div></div></div>';
+      h+='<h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Funding Breakdown</h3>';
+      h+='<div class="chart-bar"><span class="cb-label">FSF</span><div class="cb-track"><div class="cb-fill" style="width:'+(sc.fsfAlloc/maxB*100)+'%;background:var(--teal)"></div></div><span class="cb-val">'+fmt(sc.fsfAlloc)+'</span></div>';
+      h+='<div class="chart-bar"><span class="cb-label">Title I</span><div class="cb-track"><div class="cb-fill" style="width:'+(sc.titleI/maxB*100)+'%;background:var(--emerald)"></div></div><span class="cb-val">'+fmt(sc.titleI)+'</span></div>';
+      h+='<div class="chart-bar"><span class="cb-label">Grants</span><div class="cb-track"><div class="cb-fill" style="width:'+(sc.grants/maxB*100)+'%;background:var(--coral)"></div></div><span class="cb-val">'+fmt(sc.grants)+'</span></div>';
+      h+='<div class="chart-bar"><span class="cb-label">PTA</span><div class="cb-track"><div class="cb-fill" style="width:'+(sc.ptaFunding/maxB*100)+'%;background:var(--lavender)"></div></div><span class="cb-val">'+fmt(sc.ptaFunding)+'</span></div>';
+      h+='<h3 style="margin:1.5rem 0 .75rem;font-size:1rem">Demographics</h3>';
+      h+='<div class="chart-bar"><span class="cb-label">Poverty</span><div class="cb-track"><div class="cb-fill" style="width:'+sc.povertyRate+'%;background:var(--rose)"></div></div><span class="cb-val">'+sc.povertyRate+'%</span></div>';
+      h+='<div class="chart-bar"><span class="cb-label">ELL</span><div class="cb-track"><div class="cb-fill" style="width:'+sc.ellRate+'%;background:var(--teal)"></div></div><span class="cb-val">'+sc.ellRate+'%</span></div>';
+      h+='<div class="chart-bar"><span class="cb-label">SpEd</span><div class="cb-track"><div class="cb-fill" style="width:'+sc.sped+'%;background:var(--amber)"></div></div><span class="cb-val">'+sc.sped+'%</span></div>';
+      document.getElementById("modalContent").innerHTML=h;
       document.getElementById("modal").classList.add("active");
     }
-
-    document.getElementById("modalClose").addEventListener("click", function() {
-      document.getElementById("modal").classList.remove("active");
-    });
-
-    document.getElementById("modal").addEventListener("click", function(e) {
-      if (e.target === e.currentTarget) document.getElementById("modal").classList.remove("active");
-    });
-
+    document.getElementById("modalClose").addEventListener("click",function(){document.getElementById("modal").classList.remove("active")});
+    document.getElementById("modal").addEventListener("click",function(e){if(e.target===e.currentTarget)document.getElementById("modal").classList.remove("active")});
     applyFilters();
   </script>
 
